@@ -14,6 +14,7 @@
 #include "net_time.h"
 #include "c_number.h"
 #include "epd_2in66.h"
+#include "esp32_u8g2.h"
 
 #define PIN_NUM_LED 2
 #define mdelay(ms) vTaskDelay(ms / portTICK_RATE_MS)
@@ -213,12 +214,54 @@ static void time_app_task(void *pvParameters)
 	}
 
 }
+extern void esp32_epd_2in66_clear(uint16_t width, uint16_t height);
 
 static void test_task(void *pvParameters)
 {
-	epd_2in66_dev_init(152, 296);
-	epd_2in66_clear();
+	u8g2_t u8g2;
+	char str[40] = {'\0'};
 
+	//u8g2_InitInterface(&u8g2);
+	esp32_u8g2_setup(&u8g2);
+	u8g2_InitDisplay(&u8g2);
+	u8g2_SetPowerSave(&u8g2, 0);
+	u8g2_ClearBuffer(&u8g2);
+
+	u8g2_FirstPage(&u8g2);
+
+
+	u8g2.draw_color = 0;
+    u8g2_SetFontMode(&u8g2, 1); /*字体模式选择*/
+    u8g2_SetFontDirection(&u8g2, 0); /*字体方向选择*/
+    u8g2_SetFont(&u8g2, u8g2_font_inb24_mf); /*字库选择*/
+    u8g2_DrawStr(&u8g2, 0, 30, "U");
+#if 1
+
+    u8g2_SetFontDirection(&u8g2, 1);
+    u8g2_SetFont(&u8g2, u8g2_font_inb30_mn);
+    u8g2_DrawStr(&u8g2, 21,8,"8");
+#if 1
+    u8g2_SetFontDirection(&u8g2, 0);
+    u8g2_SetFont(&u8g2, u8g2_font_inb24_mf);
+    u8g2_DrawStr(&u8g2, 51,30,"g");
+    u8g2_DrawStr(&u8g2, 67,30,"\xb2");
+    
+    u8g2_DrawHLine(&u8g2, 2, 35, 47);
+    u8g2_DrawHLine(&u8g2, 3, 36, 47);
+    u8g2_DrawVLine(&u8g2, 45, 32, 12);
+    u8g2_DrawVLine(&u8g2, 46, 33, 12);
+    u8g2_SetFont(&u8g2, u8g2_font_4x6_tr);
+	sprintf(str, "github.com/olikraus/u8g2");
+	u8g2_DrawStr(&u8g2, 1,54,str);
+#endif
+
+	//u8x8_RefreshDisplay(u8g2_GetU8x8(&u8g2));
+#endif
+	u8g2_SetFontMode(&u8g2, 0);
+
+	u8g2_SetFont(&u8g2, u8g2_font_10x20_mf);
+    u8g2_DrawStr(&u8g2, 50,100,"Hello World!");
+	u8g2_NextPage(&u8g2);
 	while(1) {
 		gpio_set_level(PIN_NUM_LED, 0);
 		mdelay(1000);
@@ -229,7 +272,7 @@ static void test_task(void *pvParameters)
 
 void app_main(void)
 {
-	xTaskCreate(&time_app_task, "time_app_task", 10240, NULL, 5, NULL);
-	//xTaskCreate(&test_task, "test_task", 8196, NULL, 5, NULL);
+	//xTaskCreate(&time_app_task, "time_app_task", 10240, NULL, 5, NULL);
+	xTaskCreate(&test_task, "test_task", 8196, NULL, 5, NULL);
 }
 

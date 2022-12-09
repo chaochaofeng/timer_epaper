@@ -262,26 +262,6 @@ void epd_2in66_dev_init(unsigned int width, unsigned int height)
 	 EPD_2IN66_SendCommand(0x04); // POWER ON
 	 epaper_checkbusy();
 
-#if 0
-	epaper_spi_send_cmd(0x12); // BOOSTER_SOFT_START
-	epaper_checkbusy();
-	EPD_2IN66_SendCommand(0x11);
-	EPD_2IN66_SendData(0x03);
-
-	EPD_2IN66_SendCommand(0x44);
-	EPD_2IN66_SendData(0x01);	
-
-	EPD_2IN66_SendData(0x01);	
-	EPD_2IN66_SendData((width % 8 == 0)? (width / 8 ): (width / 8 + 1) );
-
-	EPD_2IN66_SendCommand(0x45);
-	EPD_2IN66_SendData(0);
-	EPD_2IN66_SendData(0);
-	EPD_2IN66_SendData((height&0xff));
-	EPD_2IN66_SendData((height&0x100)>>8);
-
-	epaper_checkbusy();
-#endif
 	//delay_ms(1000);
 }
 
@@ -401,7 +381,7 @@ static int epaper_2in66_init(struct disp_dev_st *dev)
 
 	epd_2in66_dev_init(dev->width, dev->height);
 
-	epd_2in66_clear(dev->width, dev->height);
+	//epd_2in66_clear(dev->width, dev->height);
 
 	return 0;
 }
